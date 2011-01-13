@@ -15,18 +15,18 @@
 
     var pointsRecorder = function () {
         // console.log("Recording points! Current count: ", points.length);
-        var chunkSize = 50;
+        var chunkSize = 30;
         var pointsToSave = points.slice(0,chunkSize);
         points = points.slice(chunkSize);
         // console.log("Saving ",pointsToSave.length," points");
         if(pointsToSave.length) {
-            jQuery('#pointStatus').html('Saving '+pointsToSave.length+' points');
+            jQuery('#pointStatus').html('Saving '+pointsToSave.length+' points, '+points.length+' points queued');
         } else {
             jQuery('#pointStatus').html('...');
         }
     };
 
-    setInterval(pointsRecorder, 500);
+    setInterval(pointsRecorder, 250);
 
     jQuery('html').mousemove(function(e) {
         var point = [e.timeStamp-start, e];
