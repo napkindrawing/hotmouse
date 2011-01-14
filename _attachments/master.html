@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+    <link rel="stylesheet" href="style/main.css" type="text/css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        div.click, div.point {
+            opacity: 0.2;
+            height: 4px;
+            width: 4px;
+            border-radius: 2px;
+            -moz-border-radius: 2px;
+            position: absolute;
+        }
+        div.click {
+            background: blue;
+            opacity: 0.5;
+            height: 16px;
+            width: 16px;
+            border-radius: 8px;
+            -moz-border-radius: 8px;
+        }
+        div.point {
+            background: red;
+        }
+    </style>
+  </head>
+  <body>
+    <iframe height="100%" width="100%" src="test.html?master"></iframe>
+  </body>
+  <script src="vendor/couchapp/loader.js"></script>
+  <script type="text/javascript">
+    var start = new Date();
+
+    function listenToChanges(seq_no) {
+        jQuery.couch.db('hotmouse').changes(seq_no, { include_docs: true } ).onChange(function(changes) {
+            console.log("Change!", changes);
+            for(var r in changes.results) {
+                var result = changes.results[r];
+                jQuery('body').append(jQuery('<div></div>',{
+                    'class': result.doc.type,
+                    css: {
+                        left: result.doc.x,
+                        top: result.doc.y
+                    }
+                }));
+                switch(result.doc.type) {
+                    case 'point':
+                        break;
+                    case 'click':
+                        break;
+                }
+            }
+        });
+    }
+
+    jQuery.couch.db('hotmouse').info({
+        success: function(info) {
+            console.log("info: ", info);
+            listenToChanges(info.update_seq);
+        }
+    });
+
+
+  </script>
+</html>
