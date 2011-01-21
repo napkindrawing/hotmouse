@@ -27,10 +27,18 @@
         div.point {
             background: red;
         }
+
+        #canvas {
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+
     </style>
   </head>
   <body>
     <iframe height="500" width="100%" src="index.html?master"></iframe>
+    <canvas id="canvas" height="500" width="1000"></canvas>
   </body>
   <script src="vendor/couchapp/loader.js"></script>
   <script src="vendor/couchapp/jquery.couch.js"></script>
@@ -38,23 +46,33 @@
     var start = new Date();
 
     function listenToChanges(seq_no) {
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var color = {
+            point: 'rgba(255,32,32,0.3)',
+            click: 'rgba(32,32,255,0.3)'
+        };
         jQuery.couch.db('hotmouse').changes(seq_no, { include_docs: true } ).onChange(function(changes) {
             console.log("Change!", changes);
             for(var r in changes.results) {
                 var result = changes.results[r];
-                jQuery('body').append(jQuery('<div></div>',{
-                    'class': result.doc.type,
-                    css: {
-                        left: result.doc.x,
-                        top: result.doc.y
-                    }
-                }));
+
+                ctx.strokeStyle = color[ result.doc.type ];
+                ctx.fillStyle = color[ result.doc.type ];
+
+                console.log("Drawing ",result.doc.type," at position ", result.doc.x, result.doc.y);
+
+                ctx.beginPath();
                 switch(result.doc.type) {
                     case 'point':
+                        ctx.arc(result.doc.x,result.doc.y,2,0,Math.PI*2,true);
                         break;
                     case 'click':
+                        ctx.arc(result.doc.x,result.doc.y,8,0,Math.PI*2,true);
                         break;
                 }
+                ctx.fill();
+                ctx.stroke();
             }
         });
     }
